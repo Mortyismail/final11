@@ -1,0 +1,501 @@
+#include <iostream>
+#include <list>
+#include <deque>
+#include <vector>
+#include <algorithm>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+class date {
+private:
+    int year;
+    int month;
+    int day;
+
+public:
+    date(int _year, int _month, int _day) : year(_year), month(_month), day(_day) {}
+
+    void displayDate() const {
+        cout << setfill('0') << setw(2) << day << "/" << setw(2) << month << "/" << year << endl;
+    }
+};
+
+class locataire {
+private:
+    static int cptlocat;
+    int id;
+    string nom;
+    string prenom;
+    string CIN;
+
+public:
+    locataire(string smiakeray, string kniakerai, string _CIN) : id(++cptlocat), nom(smiakeray), prenom(kniakerai), CIN(_CIN) {}
+
+    int getid() const { return id; }
+    const string& getNom() const { return nom; }
+    const string& getprenom() const { return prenom; }
+    const string& getCIN() const { return CIN; }
+
+    static void ajouterLocataire(deque<locataire>& locataires) {
+        string nom, prenom, CIN;
+        cout << "Nom : ";
+        cin >> nom;
+        cout << "Prénom : ";
+        cin >> prenom;
+        cout << "CIN : ";
+        cin >> CIN;
+        locataires.emplace_back(nom, prenom, CIN);
+        cout << "Locataire ajouté avec succès !" << endl;
+    }
+
+    static void afficherLocataires(const deque<locataire>& locataires) {
+        cout << "Liste des locataires :" << endl;
+        for (const auto& locataire : locataires) {
+            cout << "ID : " << locataire.getid() << ", Nom : " << locataire.getNom()
+                 << ", Prénom : " << locataire.getprenom() << ", CIN : " << locataire.getCIN() << endl;
+        }
+    }
+
+    static void gererMenuLocataires(deque<locataire>& locataires) {
+        int choix;
+        do {
+            cout << "\nGestion des locataires\n";
+            cout << "1. Ajouter un locataire\n";
+            cout << "2. Afficher la liste des locataires\n";
+            cout << "0. Quitter\n";
+            cout << "Choix : ";
+            cin >> choix;
+
+            switch (choix) {
+                case 1:
+                    ajouterLocataire(locataires);
+                    break;
+                case 2:
+                    afficherLocataires(locataires);
+                    break;
+                case 0:
+                    cout << "Fin de la gestion des locataires.\n";
+                    break;
+                default:
+                    cout << "Choix invalide. Veuillez réessayer.\n";
+                    break;
+            }
+        } while (choix != 0);
+    }
+};
+
+class Proprietaire {
+private:
+    static int cptProprietaire;
+    int id;
+    string nom;
+    string prenom;
+    string CIN;
+
+public:
+    Proprietaire(string moledare, string kniatempledare,string cinmoledare) : id(++cptProprietaire), nom(moledare), prenom(kniatempledare) ,CIN(cinmoledare){}
+
+    int getId() const { return id; }
+    const string& getNom() const { return nom; }
+    const string& getPrenom() const { return prenom; }
+    const string& getcin() const {return CIN ;}
+
+    static void ajouterProprietaire(list<Proprietaire>& proprietaires) {
+        string nom, prenom,CIN;
+        cout << "Nom : ";
+        getline(cin,nom);
+        cout << "Prénom : ";
+         getline(cin,prenom);
+        cout<< "CIN:";
+        getline(cin, CIN);
+        
+        proprietaires.emplace_back(nom, prenom,CIN);
+        cout << "Propriétaire ajouté avec succès !" << endl;
+    }
+
+    static void afficherProprietaires(const list<Proprietaire>& proprietaires) {
+        cout << "Liste des propriétaires :" << endl;
+        for (const auto& proprietaire : proprietaires) {
+            cout << "ID : " << proprietaire.getId() << ", Nom : " << proprietaire.getNom()
+                 << ", Prénom : " << proprietaire.getPrenom() << "CIN " << proprietaire.getcin() << endl ; 
+        }
+    }
+
+    static void gererMenuProprietaires(list<Proprietaire>& proprietaires) {
+        int choix;
+        do {
+            cout << "\nGestion des propriétaires\n";
+            cout << "1. Ajouter un propriétaire\n";
+            cout << "2. Afficher la liste des propriétaires\n";
+            cout << "0. Quitter\n";
+            cout << "Choix : ";
+            cin >> choix;
+
+            switch (choix) {
+                case 1:
+                    ajouterProprietaire(proprietaires);
+                    break;
+                case 2:
+                    afficherProprietaires(proprietaires);
+                    break;
+                case 0:
+                    cout << "Fin de la gestion des propriétaires.\n";
+                    break;
+                default:
+                    cout << "Choix invalide. Veuillez réessayer.\n";
+                    break;
+            }
+        } while (choix != 0);
+    }
+};
+
+class Logement {
+private:
+    static int cptlogement;
+    int reference;
+    int nombrePieces;
+    float surface;
+    float charges;
+    string adresse;
+    const Proprietaire* leProprietaire;
+
+public:
+    Logement(int _pieces, float _surface, float _charges, const string& _adresse, const Proprietaire& proprietaire)
+        : reference(++cptlogement), nombrePieces(_pieces), surface(_surface), charges(_charges), adresse(_adresse), leProprietaire(&proprietaire) {}
+
+    int getReference() const { return reference; }
+    int getNombrePieces() const { return nombrePieces; }
+    float getSurface() const { return surface; }
+    float getCharges() const { return charges; }
+    const string& getAdresse() const { return adresse; }
+    const Proprietaire* getProprietaire() const { return leProprietaire; }
+
+    void modifier(int newPieces, float newSurface, float newCharges, const string& newAdresse) {
+        nombrePieces = newPieces;
+        surface = newSurface;
+        charges = newCharges;
+        adresse = newAdresse;
+    }
+
+    static void ajouterLogement(deque<Logement>& logements, const list<Proprietaire>& proprietaires) {
+        int pieces;
+        float surface, charges;
+        string adresse;
+        cout << "Nombre de pièces : ";
+        cin >> pieces;
+        cout << "Surface : ";
+        cin >> surface;
+        cout << "Charges : ";
+        cin >> charges;
+        cin.ignore(); // Clear newline character from the buffer
+        cout << "Adresse : ";
+        std::getline(cin, adresse);
+        cout << "Choisissez le propriétaire par son ID :" << endl;
+        Proprietaire::afficherProprietaires(proprietaires);
+        int proprietaireID;
+        cout << "ID du propriétaire : ";
+        cin >> proprietaireID;
+
+        const Proprietaire* leProprietaire = nullptr;
+        for (const auto& proprietaire : proprietaires) {
+            if (proprietaire.getId() == proprietaireID) {
+                leProprietaire = &proprietaire;
+                break;
+            }
+        }
+
+        if (leProprietaire == nullptr) {
+            cout << "Aucun propriétaire trouvé avec cet ID." << endl;
+            return;
+        }
+
+        logements.emplace_back(pieces, surface, charges, adresse, *leProprietaire);
+        cout << "Logement ajouté avec succès !" << endl;
+    }
+
+    static void modifierOuSupprimer(deque<Logement>& logements) {
+        int referenc;
+        cout << "Entrez la référence du logement à modifier/supprimer : ";
+        cin >> referenc;
+
+        bool found = false;
+        for (auto it = logements.begin(); it != logements.end(); ++it) {
+            if (it->getReference() == referenc) {
+                found = true;
+                int choix;
+                cout << "Logement trouvé. Que voulez-vous faire ?" << endl;
+                cout << "1. Modifier le logement" << endl;
+                cout << "2. Supprimer le logement" << endl;
+                cout << "Choix : ";
+                cin >> choix;
+                if (choix == 1) {
+                    int newPieces;
+                    float newSurface, newCharges;
+                    string newAdresse;
+                    cout << "Nouveau nombre de pièces : ";
+                    cin >> newPieces;
+                    cout << "Nouvelle surface : ";
+                    cin >> newSurface;
+                    cout << "Nouvelles charges : ";
+                    cin >> newCharges;
+                    cin.ignore(); // Clear newline character from the buffer
+                    cout << "Nouvelle adresse : ";
+                    std::getline(cin, newAdresse);
+                    it->modifier(newPieces, newSurface, newCharges, newAdresse);
+                    cout << "Logement modifié avec succès !" << endl;
+                    break;
+                } else if (choix == 2) {
+                    logements.erase(std::remove_if(logements.begin(), logements.end(),
+                                                   [&](const Logement& l) { return l.getReference() == referenc; }),
+                                    logements.end());
+                    cout << "Logement supprimé avec succès !" << endl;
+                    break;
+                } else {
+                    cout << "Choix invalide." << endl;
+                }
+            }
+        }
+        if (!found) {
+            cout << "Aucun logement trouvé avec cette référence." << endl;
+        }
+    }
+
+    static void afficherLogements(const deque<Logement>& logements) {
+        cout << "Liste des logements :" << endl;
+        for (const auto& logement : logements) {
+            cout << "Référence : " << logement.getReference() << ", Adresse : " << logement.getAdresse()
+                 << ", Nombre de pièces : " << logement.getNombrePieces() << ", Surface : " << logement.getSurface()
+                 << ", Charges : " << logement.getCharges() << ", Propriétaire : " << logement.getProprietaire()->getNom() << " " << logement.getProprietaire()->getPrenom() <<"  CIN" <<logement.getProprietaire()->getcin();
+        }
+    }
+
+    static void gererMenuLogements(deque<Logement>& logements, const list<Proprietaire>& proprietaires) {
+        int choix;
+        do {
+            cout << "\nGestion des logements\n";
+            cout << "1. Ajouter un logement\n";
+            cout << "2. Modifier ou supprimer un logement\n";
+            cout << "3. Afficher la liste des logements\n";
+            cout << "0. Quitter\n";
+            cout << "Choix : ";
+            cin >> choix;
+
+            switch (choix) {
+                case 1:
+                    ajouterLogement(logements, proprietaires);
+                    break;
+                case 2:
+                    modifierOuSupprimer(logements);
+                    break;
+                case 3:
+                    afficherLogements(logements);
+                    break;
+                case 0:
+                    cout << "Fin de la gestion des logements.\n";
+                    break;
+                default:
+                    cout << "Choix invalide. Veuillez réessayer.\n";
+                    break;
+            }
+        } while (choix != 0);
+    }
+};
+
+class Bail {
+private:
+    static int cptBail;
+    int numero;
+    float loyer;
+    date debut;
+    int duree;
+    const locataire* leLocataire;
+    const Logement* leLogement;
+
+public:
+    Bail(float _loyer, const date& _debut, int _duree, const locataire* loc, const Logement* log)
+        : numero(++cptBail), loyer(_loyer), debut(_debut), duree(_duree), leLocataire(loc), leLogement(log) {}
+
+    void contratDeBail() const {
+        cout << "Numéro du bail : " << numero << endl;
+        cout << "Date de début du bail : ";
+        debut.displayDate();
+        cout << "Durée du bail (en mois) : " << duree << endl;
+        cout << "Locataire : " << leLocataire->getNom() << " " << leLocataire->getprenom() << " (CIN: "
+             << leLocataire->getCIN() << ")" << endl;
+        cout << "Propriétaire : " << leLogement->getProprietaire()->getNom() << " " << leLogement->getProprietaire()->getPrenom() << "(CIN: " << leLogement->getProprietaire()->getcin() <<")"<<endl;
+        cout << "Détails du logement :" << endl;
+        cout << "Reference logement : " << leLogement->getReference() << endl;
+         cout << "Loyer TTC : " << loyer << endl;
+        cout << "Adresse : " << leLogement->getAdresse() << endl;
+        cout << "Surface : " << leLogement->getSurface() << " m²" << endl;
+        cout << "Nombre de pièces : " << leLogement->getNombrePieces() << endl;
+        float totalAPayer = 2 * loyer + leLogement->getCharges();
+        cout << "Total à payer : " << totalAPayer << "DH"<<endl;}
+
+    static void ajouterBail(vector<Bail>& bails, deque<Logement>& logements, deque<locataire>& locataires) {
+        cout << "Ajout d'un nouveau bail :" << endl;
+
+        cout << "Choisissez le locataire par son ID :" << endl;
+        locataire::afficherLocataires(locataires);
+        int locataireID;
+        cout << "ID du locataire : ";
+        cin >> locataireID;
+
+        const locataire* leLocataire = nullptr;
+        for (const auto& locataire : locataires) {
+            if (locataire.getid() == locataireID) {
+                leLocataire = &locataire;
+                break;
+            }
+        }
+
+        if (leLocataire == nullptr) {
+            cout << "Aucun locataire trouvé avec cet ID." << endl;
+            return;
+        }
+
+        cout << "Choisissez le logement par sa référence :" << endl;
+        Logement::afficherLogements(logements);
+        int logementRef;
+        cout << "Référence du logement : ";
+        cin >> logementRef;
+
+        const Logement* leLogement = nullptr;
+        for (const auto& logement : logements) {
+            if (logement.getReference() == logementRef) {
+                leLogement = &logement;
+                break;
+            }
+        }
+
+        if (leLogement == nullptr) {
+            cout << "Aucun logement trouvé avec cette référence." << endl;
+            return;
+        }
+
+        float loyer;
+        cout << "Loyer TTC : ";
+        cin >> loyer;
+
+        int duree;
+        cout << "Durée du bail (en mois) : ";
+        cin >> duree;
+
+        cout << "Date de début du bail :" << endl;
+        int year, month, day;
+        cout << "Année : ";
+        cin >> year;
+        cout << "Mois : ";
+        cin >> month;
+        cout << "Jour : ";
+        cin >> day;
+        date debutBail(year, month, day);
+
+        bails.emplace_back(loyer, debutBail, duree, leLocataire, leLogement);
+
+        cout << "Bail ajouté avec succès !" << endl;
+    }
+
+    static void afficherBails(const vector<Bail>& bails) {
+        cout << "Liste des baux :" << endl;
+        for (const auto& bail : bails) {
+            bail.contratDeBail();
+            cout << "-----------------------------------" << endl;
+        }
+    }
+
+    static void remplirEnsembleBail(vector<Bail>& ensembleBail, deque<Logement>& logements, deque<locataire>& locataires) {
+        int choix;
+        do {
+            cout << "Ajout d'un nouveau bail :" << endl;
+            ajouterBail(ensembleBail, logements, locataires);
+
+            cout << "Voulez-vous ajouter un autre bail ? (1 pour Oui, 0 pour Non) : ";
+            cin >> choix;
+        } while (choix != 0);
+    }
+      static void supprimerBailsCourts(vector<Bail>& ensembleBail) {
+        ensembleBail.erase(std::remove_if(ensembleBail.begin(), ensembleBail.end(),
+                                          [](const Bail& b) { return b.duree < 6; }),
+                           ensembleBail.end());
+    }
+
+    static void gererMenuBails(vector<Bail>& bails, deque<Logement>& logements, deque<locataire>& locataires) {
+        int choix;
+        do {
+            cout << "\nGestion des bail\n";
+            cout << "1. Ajouter un bail\n";
+            cout << "2. Afficher la liste des baux\n";
+            cout << "3. suprime de bail\n    ";
+            cout << "0. Quitter\n";
+            cout << "Choix : ";
+            cin >> choix;
+
+            switch (choix) {
+                case 1:
+                    remplirEnsembleBail(bails, logements, locataires);
+                    break;
+                case 2:
+                    afficherBails(bails);
+                    break;
+                case 3: 
+                    supprimerBailsCourts(bails);
+                case 0:
+                    cout << "Fin de la gestion des baux.\n";
+                    break;
+                default:
+                    cout << "Choix invalide. Veuillez réessayer.\n";
+                    break;
+            }
+        } while (choix != 0);
+    }
+};
+
+int locataire::cptlocat = 0;
+int Logement::cptlogement = 0;
+int Proprietaire::cptProprietaire = 0;
+int Bail::cptBail = 0;
+
+int main() {
+    list<Proprietaire> proprietaires;
+    deque<Logement> logements;
+    deque<locataire> locataires;
+    vector<Bail> bails;
+
+    int choix;
+    do {
+        cout << "\nMenu principal\n";
+        cout << "1. Gestion des locataires\n";
+        cout << "2. Gestion des propriétaires\n";
+        cout << "3. Gestion des logements\n";
+        cout << "4. Gestion des baux\n";
+        cout << "0. Quitter\n";
+        cout << "Choix : ";
+        cin >> choix;
+
+        switch (choix) {
+            case 1:
+                locataire::gererMenuLocataires(locataires);
+                break;
+            case 2:
+                Proprietaire::gererMenuProprietaires(proprietaires);
+                break;
+            case 3:
+                Logement::gererMenuLogements(logements, proprietaires);
+                break;
+            case 4:
+                Bail::gererMenuBails(bails, logements, locataires);
+                break;
+            case 0:
+                cout << "Fin du programme.\n";
+                break;
+            default:
+                cout << "Choix invalide. Veuillez réessayer.\n";
+                break;
+        }
+    } while (choix != 0);
+
+    return 0;
+}
